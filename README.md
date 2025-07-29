@@ -26,8 +26,7 @@ IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114–117, Feb. 2018.
 #### Install dependencies:
 pip install numpy tensorflow scikit-learn matplotlib
 #### Run the Code
-python dnn_ofdm_channel_estimation.py
-
+python DNN_for_communication.py
 ### Key Functions
 	•	bpsk_mod(bits): Converts bits to BPSK symbols.
 	•	add_awgn_noise(signal, SNR_dB): Adds Gaussian noise to signal.

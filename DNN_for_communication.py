@@ -4,28 +4,39 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-# Simulation Parameters
-N = 64
-num_symbols = 20000
-pilot_idx = np.arange(0, N, 4)
+# -------------------------
+# Simulation Configuration
+# -------------------------
+N = 64  # Number of subcarriers
+num_symbols = 20000  # Number of OFDM symbols for training
+pilot_idx = np.arange(0, N, 4)  # Pilot indices (every 4th subcarrier)
 
+# -------------------------
+# Helper Functions
+# -------------------------
 def bpsk_mod(bits):
+    """Map bits to BPSK symbols: 0 -> -1, 1 -> +1"""
     return 2 * bits - 1
 
 def add_awgn_noise(signal, SNR_dB):
+    """Add AWGN noise to the signal based on given SNR in dB."""
     SNR = 10**(SNR_dB / 10)
     noise_power = np.mean(np.abs(signal)**2) / SNR
     noise = np.sqrt(noise_power / 2) * (np.random.randn(*signal.shape) + 1j*np.random.randn(*signal.shape))
     return signal + noise
 
 def mmse_channel_est(pilots_rx, pilots_tx):
+    """Perform MMSE channel estimation using received and transmitted pilot symbols."""
     H_est = pilots_rx / (pilots_tx + 1e-8)
-    return np.interp(np.arange(N), pilot_idx, H_est)
+    return np.interp(np.arange(N), pilot_idx, H_est)  # Interpolate across all subcarriers
 
 def apply_nonlinear_distortion(signal):
+    """Model nonlinear distortion (e.g., due to power amplifier)."""
     return np.tanh(signal)
 
+# -------------------------
 # Dataset Generation
+# -------------------------
 X, Y, Y_mmse, Y_ls = [], [], [], []
 SNR_dBs = np.random.uniform(5, 25, num_symbols)
 
@@ -60,36 +71,39 @@ Y = np.array(Y)
 Y_mmse = np.array(Y_mmse)
 Y_ls = np.array(Y_ls)
 
-# Normalize inputs
+# Normalize input features
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 
-# Train-Test Split
+# Split dataset into training and testing sets
 X_train, X_test, Y_train, Y_test, Y_mmse_train, Y_mmse_test, Y_ls_train, Y_ls_test = train_test_split(
     X, Y, Y_mmse, Y_ls, test_size=0.2, random_state=42
 )
 
-# DNN Model
+# -------------------------
+# Deep Neural Network Model
+# -------------------------
 model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(512, activation='relu', input_shape=(X.shape[1],)),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dense(256, activation='relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(N, activation='sigmoid')
+    tf.keras.layers.Dense(N, activation='sigmoid')  # Sigmoid for bit-wise binary output
 ])
 
 model.compile(optimizer='adam', loss='binary_crossentropy')
 
-# Training
+# Train the model
 model.fit(X_train, Y_train, epochs=10, batch_size=128, validation_split=0.1, verbose=2)
 
-# Bit Accuracy
+# -------------------------
+# Evaluation Metrics
+# -------------------------
 y_pred_dnn = model.predict(X_test) > 0.5
 bit_accuracy = np.mean(y_pred_dnn == Y_test)
-print(f"\n✅ DNN Bit Accuracy: {bit_accuracy * 100:.2f}%")
+print(f"\n\u2705 DNN Bit Accuracy: {bit_accuracy * 100:.2f}%")
 
-# BER Computation
 ber_dnn = np.mean(y_pred_dnn != Y_test)
 ber_mmse = np.mean(Y_mmse_test != Y_test)
 ber_ls = np.mean(Y_ls_test != Y_test)
@@ -99,7 +113,9 @@ print(f"DNN BER   : {ber_dnn:.4f}")
 print(f"MMSE BER  : {ber_mmse:.4f}")
 print(f"LS BER    : {ber_ls:.4f}")
 
+# -------------------------
 # Constellation Plot
+# -------------------------
 plt.figure(figsize=(6, 6))
 rx_symbols_test = X_test[:, :2*N].reshape(-1, 2)
 plt.scatter(rx_symbols_test[:, 0], rx_symbols_test[:, 1], s=1, alpha=0.5)
@@ -109,7 +125,9 @@ plt.ylabel("Imag")
 plt.grid(True)
 plt.show()
 
-# BER vs SNR
+# -------------------------
+# BER vs SNR Evaluation
+# -------------------------
 SNR_range = np.arange(0, 30, 2)
 ber_dnn_curve, ber_mmse_curve, ber_ls_curve = [], [], []
 
@@ -150,6 +168,7 @@ for snr in SNR_range:
     ber_mmse_curve.append(np.mean(Y_mmse_snr != Y_snr))
     ber_ls_curve.append(np.mean(Y_ls_snr != Y_snr))
 
+# Plot BER vs SNR
 plt.figure()
 plt.semilogy(SNR_range, ber_dnn_curve, 'o-', label='DNN')
 plt.semilogy(SNR_range, ber_mmse_curve, 's-', label='MMSE')

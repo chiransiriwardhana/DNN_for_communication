@@ -4,3 +4,11 @@ This repository implements a deep neural network (DNN) to jointly estimate the c
 H. Ye, G. Y. Li, and B.-H. Juang,
 “Power of Deep Learning for Channel Estimation and Signal Detection in OFDM Systems,”
 IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114–117, Feb. 2018.
+
+### Features
+	•	BPSK modulation over 64-subcarrier OFDM.
+	•	Multipath Rayleigh fading channels.
+	•	AWGN noise and nonlinear distortion simulation.
+	•	Pilot-assisted MMSE and LS estimators.
+	•	DNN model trained offline using pilots + received data.
+	•	BER and bit accuracy comparison.

@@ -21,3 +21,22 @@ IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114–117, Feb. 2018.
 	•	Dense(128)
 	•	Dense(64) output (1 per bit)
 	•	Output: Bitwise logits (interpreted using sigmoid during inference).
+### Requirements
+
+#### Install dependencies:
+pip install numpy tensorflow scikit-learn matplotlib
+#### Run the Code
+python dnn_ofdm_channel_estimation.py
+
+### Key Functions
+	•	bpsk_mod(bits): Converts bits to BPSK symbols.
+	•	add_awgn_noise(signal, SNR_dB): Adds Gaussian noise to signal.
+	•	mmse_channel_est(pilots_rx, pilots_tx): Simple MMSE estimator using pilots.
+	•	apply_nonlinear_distortion(signal): Simulates RF nonlinearities.
+	•	model.fit(...): Trains DNN on pilot-enhanced features.
+
+ ### Performance Evaluation
+	•	Uses train_test_split() to partition data.
+	•	Evaluation metrics:
+	•	Bitwise Accuracy (np.mean(y_pred == y_true))
+	•	Bit Error Rate (np.mean(y_pred != y_true))

@@ -12,3 +12,12 @@ IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114–117, Feb. 2018.
 	•	Pilot-assisted MMSE and LS estimators.
 	•	DNN model trained offline using pilots + received data.
 	•	BER and bit accuracy comparison.
+
+### Model Architecture
+	•	Input: Real and imaginary parts of received symbols + pilot symbols.
+	•	Architecture:
+	•	Dense(512) → BatchNorm → Dropout(0.3)
+	•	Dense(256) → BatchNorm → Dropout(0.3)
+	•	Dense(128)
+	•	Dense(64) output (1 per bit)
+	•	Output: Bitwise logits (interpreted using sigmoid during inference).

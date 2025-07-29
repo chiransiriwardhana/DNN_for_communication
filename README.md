@@ -1,4 +1,4 @@
-# DNN_for_communication
+# OFDM Signal Detection using Deep Neural Network (DNN)
 This repository implements a deep neural network (DNN) to jointly estimate the channel and detect transmitted bits in an OFDM system, replicating and improving the results in the paper:
 
 H. Ye, G. Y. Li, and B.-H. Juang,
@@ -6,21 +6,26 @@ H. Ye, G. Y. Li, and B.-H. Juang,
 IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114–117, Feb. 2018.
 
 ### Features
-	•	BPSK modulation over 64-subcarrier OFDM.
-	•	Multipath Rayleigh fading channels.
-	•	AWGN noise and nonlinear distortion simulation.
-	•	Pilot-assisted MMSE and LS estimators.
-	•	DNN model trained offline using pilots + received data.
-	•	BER and bit accuracy comparison.
+	•	BPSK-modulated OFDM system with 64 subcarriers
+	•	Nonlinear distortion modeled with tanh
+	•	Pilot-based MMSE channel estimation
+	•	Deep Neural Network (DNN) for joint detection
+	•	BER comparison with MMSE and LS estimators
+	•	BER vs SNR curve generation
+	•	Constellation plotting of received symbols
+
 
 ### Model Architecture
-	•	Input: Real and imaginary parts of received symbols + pilot symbols.
-	•	Architecture:
-	•	Dense(512) → BatchNorm
-	•	Dense(256) → BatchNorm
-	•	Dense(128)
-	•	Dense(64) output (1 per bit)
-	•	Output: Bitwise logits (interpreted using sigmoid during inference).
+	The DNN model has:
+	•	Input: Real & Imag parts of subcarriers and pilot symbols
+	•	Hidden Layers: [512 → BatchNorm → 256 → BatchNorm → 128]
+	•	Output: 64 sigmoid neurons for bit-wise classification
+
+Loss: Binary Crossentropy
+Optimizer: Adam
+Epochs: 10
+Batch Size: 128
+
 ### Requirements
 
 #### Install dependencies:
@@ -39,3 +44,7 @@ python DNN_for_communication.py
 	•	Evaluation metrics:
 	•	Bitwise Accuracy (np.mean(y_pred == y_true))
 	•	Bit Error Rate (np.mean(y_pred != y_true))
+
+ ### Visualizations
+	•	Constellation Plot of received OFDM symbols
+	•	BER vs. SNR Curve for DNN, MMSE, and LS detectors
